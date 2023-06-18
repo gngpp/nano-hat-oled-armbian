@@ -26,8 +26,6 @@ import smbus
 import subprocess
 import time
 
-DISPLAY_OFF_TIMEOUT = 30
-
 cmd_index = 0
 current_time = time.time()
 display_refresh_time = 0
