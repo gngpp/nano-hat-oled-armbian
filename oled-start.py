@@ -31,12 +31,9 @@ import smbus
 import subprocess
 import time
 
-DISPLAY_OFF_TIMEOUT = 30
-
 cmd_index = 0
 current_time = time.time()
 display_refresh_time = 0
-display_off_time = current_time + DISPLAY_OFF_TIMEOUT
 i2c0_bus = smbus.SMBus(0)  # access to OLED
 image = Image.new("1", (128, 64))
 image_draw = ImageDraw.Draw(image)
@@ -128,23 +125,17 @@ try:
       if file.read(1) == "1":
         cmd_index = key1_cmd_index
         display_refresh_time = 0
-        display_off_time = current_time + DISPLAY_OFF_TIMEOUT
         continue
     with open("/sys/class/gpio/gpio2/value") as file:  # poll key2 down
       if file.read(1) == "1":
         cmd_index = key2_cmd_index
         display_refresh_time = 0
-        display_off_time = current_time + DISPLAY_OFF_TIMEOUT
         continue
     with open("/sys/class/gpio/gpio3/value") as file:  # poll key3 down
       if file.read(1) == "1":
         cmd_index = key3_cmd_index
         display_refresh_time = 0
-        display_off_time = current_time + DISPLAY_OFF_TIMEOUT
         continue
-    if current_time > display_off_time:
-      i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAE])  # set display off
-      continue
     elif current_time > display_refresh_time:
       i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAF])  # set display on
       if cmd_index == 0:
@@ -155,7 +146,7 @@ try:
         image.paste(splash)
         write_i2c_image_data(i2c0_bus, image)
         splash.close()
-        display_refresh_time = current_time + DISPLAY_OFF_TIMEOUT
+        display_refresh_time = current_time
       elif cmd_index == 1:
         key1_cmd_index = 0
         key2_cmd_index = 2
