@@ -136,7 +136,7 @@ try:
         cmd_index = key3_cmd_index
         display_refresh_time = 0
         continue
-    elif current_time > display_refresh_time:
+    if current_time > display_refresh_time:
       i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAF])  # set display on
       if cmd_index == 0:
         key1_cmd_index = 1
@@ -169,7 +169,7 @@ try:
           shell=True,
         )
         text2 = subprocess.check_output(
-          'df -h | awk \'$NF=="/"{printf "Card: %d/%dGB %s", $3,$2,$5}\'',
+          'df -h | awk \'$NF=="/"{printf "Disk: %d/%dGB %s", $3,$2,$5}\'',
           shell=True,
         )
         text3 = subprocess.check_output(

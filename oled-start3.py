@@ -1,32 +1,9 @@
-"""
-## License
-The MIT License (MIT)
-NanoHAT OLED for Armbian: NanoHAT OLED and GPIO Button Control for Armbian
-Copyright (C)2020 CrouchingTigerHiddenAdam @tigerhiddenadam
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-"""
-
 from PIL import Image, ImageDraw, ImageFont
 import os
 import smbus
 import subprocess
 import time
 
-cmd_index = 0
 current_time = time.time()
 display_refresh_time = 0
 i2c0_bus = smbus.SMBus(0)  # access to OLED
@@ -40,7 +17,7 @@ key1_cmd_index = 1
 key2_cmd_index = 2
 key3_cmd_index = 3
 shutdown_time = 0
-
+cmd_index = key2_cmd_index
 
 def write_i2c_image_data(i2c_bus, image):
   block_data = []
@@ -131,7 +108,7 @@ try:
         cmd_index = key3_cmd_index
         display_refresh_time = 0
         continue
-    elif current_time > display_refresh_time:
+    if current_time > display_refresh_time:
       i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAF])  # set display on
       if cmd_index == 0:
         key1_cmd_index = 1
@@ -164,22 +141,22 @@ try:
           text=True,
         )
         text2 = subprocess.check_output(
-          'df -h | awk \'$NF=="/"{printf "Card: %d/%dGB %s", $3,$2,$5}\'',
+          'df -h | awk \'$NF=="/"{printf "Disk: %d/%dGB %s", $3,$2,$5}\'',
           shell=True,
           text=True,
         )
         text3 = subprocess.check_output(
-          "free -m | awk 'NR==2{printf \"RAM:  %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'",
+          "free -m | awk 'NR==2{printf \"RAM:  %s/%sMB\", $3,$2 }'",
           shell=True,
           text=True,
         )
         text4 = subprocess.check_output(
-          "top -bn1 | grep load | awk '{printf \"Load: %.2f\", $(NF-2)}'",
+          "top -bn1 | grep 'Cpu' | awk '{printf \"CPU:  %.2f %%\", $(2)}'",
           shell=True,
           text=True,
         )
         text5 = subprocess.check_output(
-          "cat /sys/class/thermal/thermal_zone0/temp | awk '{printf \"Temp: %3.1fc\", $1/1000}'",
+          "cat /sys/class/thermal/thermal_zone0/temp | awk '{printf \"Temp: %3.1f °C\", $1/1000}'",
           shell=True,
           text=True,
         )
