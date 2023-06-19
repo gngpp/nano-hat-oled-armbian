@@ -19,7 +19,7 @@ then
   rm /tmp/nano-hat-oled-armbian -rf
 fi
 cd /tmp
-git clone https://github.com/crouchingtigerhiddenadam/nano-hat-oled-armbian
+git clone https://github.com/gngpp/nano-hat-oled-armbian
 cd ./nano-hat-oled-armbian
 
 # Compile the code
