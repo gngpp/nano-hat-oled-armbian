@@ -126,15 +126,7 @@ try:
         continue
     if current_time > display_refresh_time:
       i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAF])  # set display on
-      if cmd_index == 0:
-        key1_cmd_index = 1
-        key2_cmd_index = 2
-        key3_cmd_index = 3
-        splash = Image.open("splash.png")
-        image.paste(splash)
-        write_i2c_image_data(i2c0_bus, image)
-        splash.close()
-      elif cmd_index == 1:
+      if cmd_index == 1:
         key1_cmd_index = 0
         key2_cmd_index = 2
         key3_cmd_index = 3
@@ -215,7 +207,7 @@ except KeyboardInterrupt:
   print(" CTRL+C detected")
 
 finally:
-
+  print("panic")
   i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAE])  # set display off
   with open("/sys/class/gpio/unexport", "w") as file:
     file.write("0\n")  # release GPIO 0 (key1)
