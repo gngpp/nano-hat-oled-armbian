@@ -3,6 +3,8 @@ import os
 import smbus
 import subprocess
 import time
+import signal
+import sys
 
 current_time = time.time()
 display_refresh_time = 0
@@ -40,8 +42,22 @@ def write_i2c_image_data(i2c_bus, image):
       x = x + 1
     page = page + 1
 
+def sigterm_handler(signal, frame):
+    print("Received SIGTERM signal. Exiting...")
+    i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAE])  # set display off
+    sys.exit(0)
+
+def sigint_handler(signal, frame):
+    print("Received SIGINT signal. Exiting...")
+    i2c0_bus.write_i2c_block_data(0x3C, 0x00, [0xAE])  # set display off
+    sys.exit(0)
+
 
 try:
+
+  signal.signal(signal.SIGTERM, sigterm_handler)
+
+  signal.signal(signal.SIGINT, sigint_handler)
 
   with open("/sys/class/gpio/export", "w") as file:
     file.write("0\n")  # initialise GPIO 0 (key1)
